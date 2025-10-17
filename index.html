@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sciences du Langage - Plateforme d'Apprentissage</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1a202c;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+
+        .btn {
+            padding: 10px 25px;
+            background: white;
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: var(--primary); color: white; }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .hero h1 { font-size: 36px; margin-bottom: 15px; }
+        .hero p { font-size: 18px; margin-bottom: 25px; }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .course-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+        }
+
+        .course-body { padding: 20px; }
+
+        .course-topics {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .course-topics li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--gray);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .course-topics li:before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .chat-section {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--light);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+
+        .tutor-message {
+            background: white;
+            border: 1px solid var(--border);
+        }
+
+        .student-message {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .chat-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .hidden { display: none; }
+
+        .loading span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading span:nth-child(2) { animation-delay: 0.2s; }
+        .loading span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 28px; }
+            .courses-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">📚 Sciences du Langage</div>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#cours">Cours</a></li>
+                <li><a href="#support">Support</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="accueil">
+        <h1>Formation en Linguistique</h1>
+        <p>Plateforme complète pour l'étude des sciences du langage</p>
+        <a href="#cours" class="btn">Commencer</a>
+    </section>
+
+    <div class="container" id="cours">
+        <h2 class="section-title">Programmes d'Études</h2>
+        <div class="courses-grid">
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>Phonétique & Phonologie</h3>
+                    <p>12 séances • 8 heures</p>
+                </div>
+                <div class="course-body">
+                    <ul class="course-topics">
+                        <li>Appareil phonatoire</li>
+                        <li>Classification des sons</li>
+                        <li>Alphabet Phonétique International</li>
+                        <li>Phonèmes et allophones</li>
+                        <li>Prosodie et intonation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>Morphologie</h3>
+                    <p>15 séances • 10 heures</p>
+                </div>
+                <div class="course-body">
+                    <ul class="course-topics">
+                        <li>Morphèmes libres et liés</li>
+                        <li>Dérivation et composition</li>
+                        <li>Flexion nominale et verbale</li>
+                        <li>Analyse morphologique</li>
+                        <li>Morphologie lexicale</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>Syntaxe</h3>
+                    <p>18 séances • 12 heures</p>
+                </div>
+                <div class="course-body">
+                    <ul class="course-topics">
+                        <li>Structure de la phrase</li>
+                        <li>Grammaire générative</li>
+                        <li>Arbres syntaxiques</li>
+                        <li>Relations grammaticales</li>
+                        <li>Typologie syntaxique</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>Sémantique</h3>
+                    <p>14 séances • 9 heures</p>
+                </div>
+                <div class="course-body">
+                    <ul class="course-topics">
+                        <li>Théories du sens</li>
+                        <li>Relations sémantiques</li>
+                        <li>Analyse componentielle</li>
+                        <li>Champs lexicaux</li>
+                        <li>Sémantique cognitive</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>Pragmatique</h3>
+                    <p>10 séances • 7 heures</p>
+                </div>
+                <div class="course-body">
+                    <ul class="course-topics">
+                        <li>Actes de langage</li>
+                        <li>Implicatures conversationnelles</li>
+                        <li>Deixis et référence</li>
+                        <li>Principe de coopération</li>
+                        <li>Politesse linguistique</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>Sociolinguistique</h3>
+                    <p>16 séances • 11 heures</p>
+                </div>
+                <div class="course-body">
+                    <ul class="course-topics">
+                        <li>Variation linguistique</li>
+                        <li>Diglossie et bilinguisme</li>
+                        <li>Politique linguistique</li>
+                        <li>Changement linguistique</li>
+                        <li>Dialectologie</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-section" id="support">
+        <h2 class="section-title">Support Pédagogique</h2>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3>📖 Assistance Linguistique</h3>
+                <p>Posez vos questions en sciences du langage</p>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message tutor-message">
+                    <strong>Support Pédagogique</strong><br><br>
+                    Bonjour! Je suis à votre disposition pour répondre à toutes vos questions en linguistique.<br><br>
+                    Exemples de questions:<br>
+                    • Qu'est-ce qu'un morphème?<br>
+                    • Explique la différence entre phonème et allophone<br>
+                    • Comment fonctionne la grammaire générative?<br>
+                    • Qu'est-ce que la diglossie?<br><br>
+                    N'hésitez pas!
+                </div>
+            </div>
+            <div class="chat-input-group">
+                <input type="text" id="chatInput" placeholder="Posez votre question..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button class="btn btn-primary" onclick="sendMessage()">Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Plateforme des Sciences du Langage</p>
+        <p style="margin-top:10px; opacity:0.7;">Technologie d'apprentissage avancée</p>
+    </footer>
+
+    <script>
+        const API_KEY = "AIzaSyCHzN5V-1la5TIIAhmj9Vrjus63iMnNVAM";
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'student');
+            input.value = '';
+
+            const loading = addMessage('<div class="loading"><span></span><span></span><span></span></div> Analyse en cours...', 'tutor');
+
+            try {
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `Tu es un expert en linguistique et sciences du langage. Réponds à cette question de manière académique, claire et pédagogique en français. N'utilise JAMAIS les termes "IA", "AI", "intelligence artificielle", "Gemini", "assistant virtuel" ou toute référence à être une machine. Réponds toujours comme un professeur humain expérimenté.\n\nQuestion: ${message}`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                loading.remove();
+
+                if (data.candidates && data.candidates[0]) {
+                    const answer = data.candidates[0].content.parts[0].text;
+                    addMessage('<strong>Support Pédagogique</strong><br><br>' + answer, 'tutor');
+                } else if (data.error) {
+                    addMessage('<strong>Support Pédagogique</strong><br><br>❌ Erreur: ' + data.error.message + '<br><br>Vérifiez que votre clé API est valide et active.', 'tutor');
+                } else {
+                    addMessage('<strong>Support Pédagogique</strong><br><br>⚠️ Une erreur technique s\'est produite. Veuillez reformuler votre question.', 'tutor');
+                }
+            } catch (error) {
+                loading.remove();
+                addMessage('<strong>Support Pédagogique</strong><br><br>❌ Problème de connexion: ' + error.message + '<br><br>Vérifiez votre connexion Internet.', 'tutor');
+                console.error('Erreur:', error);
+            }
+        }
+
+        function addMessage(text, type) {
+            const container = document.getElementById('chatMessages');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}-message`;
+            msg.innerHTML = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+            return msg;
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        console.log('✅ Plateforme chargée avec succès!');
+        console.log('🔑 API Key configurée');
+    </script>
+</body>
+</html>
