@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyse Linguistique - Plateforme IA</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      padding: 30px 0;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    #chat {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    #chat-output {
+      height: 400px;
+      overflow-y: auto;
+      border: 2px solid #e0e0e0;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background: #f9f9f9;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 12px 18px;
+      border-radius: 15px;
+      max-width: 80%;
+      word-wrap: break-word;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message {
+      background: #667eea;
+      color: white;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .ai-message {
+      background: #e8eaf6;
+      color: #333;
+      margin-right: auto;
+      white-space: pre-wrap;
+    }
+
+    #user-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 15px;
+      font-size: 16px;
+      resize: vertical;
+      min-height: 80px;
+      margin-bottom: 15px;
+      font-family: inherit;
+    }
+
+    #user-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #support {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    #support h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    #proxy-url {
+      width: calc(100% - 150px);
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    #save-proxy {
+      padding: 12px 30px;
+    }
+
+    #status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    #status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    footer {
+      text-align: center;
+      color: white;
+      padding: 30px 0;
+      margin-top: 40px;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      #chat, #support {
+        padding: 20px;
+      }
+
+      #proxy-url {
+        width: 100%;
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+
+      #save-proxy {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎓 Analyse Linguistique - Plateforme IA</h1>
+  </header>
+
+  <main>
+    <section id="chat">
+      <div id="chat-output"></div>
+      <textarea id="user-input" placeholder="Posez votre question linguistique..."></textarea>
+      <button id="send-btn">Envoyer 📤</button>
+    </section>
+
+    <section id="support">
+      <h2>⚙️ Configuration du Proxy</h2>
+      <input type="text" id="proxy-url" placeholder="Ex: https://linguistique-proxy.onrender.com/api/chat">
+      <button id="save-proxy">Sauvegarder ✅</button>
+      <p id="status"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Analyse Linguistique - Master SDL | Abdelkrim Bettahar</p>
+  </footer>
+
+  <script>
+    let proxyURL = localStorage.getItem('proxyURL') || '';
+
+    document.getElementById('proxy-url').value = proxyURL;
+
+    document.getElementById('save-proxy').addEventListener('click', async () => {
+      const url = document.getElementById('proxy-url').value.trim();
+      const statusEl = document.getElementById('status');
+
+      if (!url) {
+        statusEl.textContent = '❌ Veuillez entrer une URL valide';
+        statusEl.className = 'error';
+        return;
+      }
+
+      try {
+        const response = await fetch(url.replace('/api/chat', ''));
+        if (response.ok) {
+          localStorage.setItem('proxyURL', url);
+          proxyURL = url;
+          statusEl.textContent = '✅ Proxy sauvegardé avec succès !';
+          statusEl.className = 'success';
+        } else {
+          throw new Error('Connection failed');
+        }
+      } catch (error) {
+        statusEl.textContent = '❌ Erreur de connexion au serveur Proxy';
+        statusEl.className = 'error';
+      }
+    });
+
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    document.getElementById('user-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    async function sendMessage() {
+      const input = document.getElementById('user-input');
+      const message = input.value.trim();
+      const chatOutput = document.getElementById('chat-output');
+      const sendBtn = document.getElementById('send-btn');
+
+      if (!message) return;
+
+      if (!proxyURL) {
+        alert('❌ Veuillez configurer l\'URL du Proxy d\'abord');
+        return;
+      }
+
+      appendMessage(message, 'user');
+      input.value = '';
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span class="loading"></span> Envoi...';
+
+      try {
+        const response = await fetch(proxyURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          appendMessage(data.response, 'ai');
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        appendMessage('❌ Erreur de connexion. Vérifiez votre configuration Proxy.', 'ai');
+        console.error('Error:', error);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = 'Envoyer 📤';
+      }
+    }
+
+    function appendMessage(text, type) {
+      const chatOutput = document.getElementById('chat-output');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}-message`;
+      messageDiv.textContent = text;
+      chatOutput.appendChild(messageDiv);
+      chatOutput.scrollTop = chatOutput.scrollHeight;
+    }
+
+    window.addEventListener('load', () => {
+      appendMessage('Bonjour! Je suis votre assistant linguistique IA. Posez-moi vos questions sur la linguistique française! 🇫🇷', 'ai');
+    });
+  </script>
+</body>
+</html>
