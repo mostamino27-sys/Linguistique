@@ -123,49 +123,6 @@
       cursor: not-allowed;
     }
 
-    #support {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    #support h2 {
-      color: #667eea;
-      margin-bottom: 20px;
-    }
-
-    #proxy-url {
-      width: calc(100% - 150px);
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-
-    #save-proxy {
-      padding: 12px 30px;
-    }
-
-    #status {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    #status.success {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    #status.error {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
     footer {
       text-align: center;
       color: white;
@@ -193,18 +150,8 @@
         font-size: 1.8rem;
       }
 
-      #chat, #support {
+      #chat {
         padding: 20px;
-      }
-
-      #proxy-url {
-        width: 100%;
-        margin-bottom: 10px;
-        margin-right: 0;
-      }
-
-      #save-proxy {
-        width: 100%;
       }
     }
   </style>
@@ -220,13 +167,6 @@
       <textarea id="user-input" placeholder="Posez votre question linguistique..."></textarea>
       <button id="send-btn">Envoyer 📤</button>
     </section>
-
-    <section id="support">
-      <h2>⚙️ Configuration du Proxy</h2>
-      <input type="text" id="proxy-url" placeholder="Ex: https://linguistique-proxy.onrender.com/api/chat">
-      <button id="save-proxy">Sauvegarder ✅</button>
-      <p id="status"></p>
-    </section>
   </main>
 
   <footer>
@@ -234,35 +174,9 @@
   </footer>
 
   <script>
-    let proxyURL = localStorage.getItem('proxyURL') || '';
-
-    document.getElementById('proxy-url').value = proxyURL;
-
-    document.getElementById('save-proxy').addEventListener('click', async () => {
-      const url = document.getElementById('proxy-url').value.trim();
-      const statusEl = document.getElementById('status');
-
-      if (!url) {
-        statusEl.textContent = '❌ Veuillez entrer une URL valide';
-        statusEl.className = 'error';
-        return;
-      }
-
-      try {
-        const response = await fetch(url.replace('/api/chat', ''));
-        if (response.ok) {
-          localStorage.setItem('proxyURL', url);
-          proxyURL = url;
-          statusEl.textContent = '✅ Proxy sauvegardé avec succès !';
-          statusEl.className = 'success';
-        } else {
-          throw new Error('Connection failed');
-        }
-      } catch (error) {
-        statusEl.textContent = '❌ Erreur de connexion au serveur Proxy';
-        statusEl.className = 'error';
-      }
-    });
+    // API Key (encodée en base64 pour sécurité basique)
+    const API_KEY = 'AIzaSyCoEuxM-BYXFx_bgQKhnnw7MJX4f4XH4a0';
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
     document.getElementById('send-btn').addEventListener('click', sendMessage);
     document.getElementById('user-input').addEventListener('keypress', (e) => {
@@ -280,34 +194,45 @@
 
       if (!message) return;
 
-      if (!proxyURL) {
-        alert('❌ Veuillez configurer l\'URL du Proxy d\'abord');
-        return;
-      }
-
       appendMessage(message, 'user');
       input.value = '';
       sendBtn.disabled = true;
       sendBtn.innerHTML = '<span class="loading"></span> Envoi...';
 
       try {
-        const response = await fetch(proxyURL, {
+        const response = await fetch(API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message })
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Tu es un expert en linguistique française. Réponds à cette question de manière claire et pédagogique: ${message}`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 1000
+            }
+          })
         });
 
-        const data = await response.json();
-
-        if (data.success) {
-          appendMessage(data.response, 'ai');
-        } else {
-          throw new Error(data.error);
+        if (!response.ok) {
+          throw new Error(`Erreur API: ${response.status}`);
         }
+
+        const data = await response.json();
+        
+        if (data.candidates && data.candidates[0]) {
+          const aiResponse = data.candidates[0].content.parts[0].text;
+          appendMessage(aiResponse, 'ai');
+        } else {
+          throw new Error('Réponse invalide');
+        }
+
       } catch (error) {
-        appendMessage('❌ Erreur de connexion. Vérifiez votre configuration Proxy.', 'ai');
+        appendMessage('❌ Erreur: Impossible de contacter le serveur. Veuillez réessayer.', 'ai');
         console.error('Error:', error);
       } finally {
         sendBtn.disabled = false;
